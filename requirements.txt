@@ -2,3 +2,4 @@ keyboard
 pyperclip
 fbchat
 pyscreenshot
+PyMouse

