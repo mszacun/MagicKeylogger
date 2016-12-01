@@ -3,3 +3,4 @@ pyperclip
 fbchat
 pyscreenshot
 PyMouse
+watchdog
