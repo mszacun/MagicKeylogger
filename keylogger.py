@@ -64,7 +64,7 @@ class Keylogger(object):
 
     def _mark_mouse_position(self, screenshot):
         mouse_x, mouse_y = pymouse.PyMouse().position()
-        ImageDraw.Draw(screenshot).ellipse([mouse_x - 10, mouse_y - 10, mouse_x + 10, mouse_y + 10], fill=(255, 0, 0))
+        ImageDraw.Draw(screenshot).ellipse([mouse_x - 10, mouse_y - 10, mouse_x + 10, mouse_y + 10], fill=(0, 0, 255))
 
         return screenshot
 
